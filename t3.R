@@ -1,5 +1,5 @@
 # ---------
-#  25-2
+#  25-2 轉utf-8
 # ---------
 # ---------------------------------------------------------- #
 
@@ -10,46 +10,46 @@ indicators <- c("BX.KLT.DINV.WD.GD.ZS", "NY.GDP.DEFL.KD.ZG",
 
 library(WDI)
 
-# �N�Ҧ���a�������ܼƪ���T��X��J�C��
-# ���O�Ҧ���a�����C�ӫ����ܼƪ���T
-# �@�ǰ�a�����L������
+# 將所有國家的指標變數的資訊抽出放入列表
+# 不是所有國家都有每個指標變數的資訊
+# 一些國家完全無任何資料
 wbInfo <- WDI(country="all", indicator=indicators, start=2011,
               end=2011, extra=TRUE)
 
-# �NAggregates��T������
+# 將Aggregates資訊移除掉
 wbInfo <- wbInfo[wbInfo$region != "Aggregates", ]
 
-# �N�Ҧ������ܼƬ�NA����a������
+# 將所有指標變數為NA的國家移除掉
 wbInfo <- wbInfo[which(rowSums(!is.na(wbInfo[, indicators])) > 0), ]
 
-# �Niso���򥢭Ȫ���Ʋ�����
+# 將iso為遺失值的橫排移除掉
 wbInfo <- wbInfo[!is.na(wbInfo$iso2c), ]
 
 # ---------------------------------------------------------- #
 
-# �ѩ�ڭ̤��̾ڰ�a�����s
-# �]�w��ƦW�٥i�H���ڭ̪��D��Ʃ��ݰ�a
+# 由於我們不依據國家做分群
+# 設定橫排名稱可以讓我們知道橫排所屬國家
 rownames(wbInfo) <- wbInfo$iso2c
 
-# ���s�]�Ƥưϰ�(region),���J(income)�M�ɶU(lending)
-# �o�˥��̪�level�������ܤƳ���Q�Ҷq�b��
+# 重新因數化區域(region),收入(income)和借貸(lending)
+# 這樣它們的level有任何變化都能被考量在內
 wbInfo$region <- factor(wbInfo$region)
 wbInfo$income <- factor(wbInfo$income)
 wbInfo$lending <- factor(wbInfo$lending)
 
 # ---------------------------------------------------------- #
 
-# ��X�n�O�d������
+# 找出要保留的直排
 keep.cols <- which(!names(wbInfo) %in% c("iso2c", "country", "year",
                                          "capital", "iso3c"))
-# ���s
+# 分群
 wbPam <- pam(x=wbInfo[, keep.cols], k=12, keep.diss=TRUE,
              keep.data=TRUE)
 
-# ���medoid�[����
+# 顯示medoid觀測值
 wbPam$medoids
 
-# ø�s���v��
+# 繪製側影圖
 plot(wbPam, which.plots=2, main="")
 
 # ---------------------------------------------------------- #
@@ -83,10 +83,10 @@ world@data$FipsCntry <- as.character(
 
 # ---------------------------------------------------------- #
 
-# �ξ�ƦW�٫إߤ@��id����
+# 用橫排名稱建立一個id直排
 world@data$id <- rownames(world@data)
 
-#�⥦�ഫ��data.frame
+#把它轉換成data.frame
 library(broom)
 world.df <- fortify(world, region = "id")
 head(world.df)
