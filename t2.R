@@ -9,13 +9,13 @@ head(baseball)
 
 # ---------------------------------------------------------- #
 
-## �إߨ�ƥH�p�⥴���v
-# data������
-# boot�N�ǻ����P�ժ�����(indices)
-# �b��@���ǻ���,���Ǿ�ƪ����޷|�X�{�X��
-# ���ǫh�������|�X�{
-# �����ӻ�63%����Ʒ|�X�{
-# boot�N���Ʃʦa�I�s�����
+## 我建立函數以計算打擊率
+# data為原資料
+# boot將傳遞不同組的索引(indices)
+# 在單一次傳遞裏,有些橫排的索引會出現幾次
+# 有些則完全不會出現
+# 平均來說63%的橫排會出現
+# boot將重複性地呼叫此函數
 bat.avg <- function(data, indices=1:NROW(data), hits="h",
                     at.bats="ab")
       {
@@ -23,18 +23,18 @@ bat.avg <- function(data, indices=1:NROW(data), hits="h",
          sum(data[indices, at.bats], na.rm=TRUE)
       }
 
-# �έ��ƨӴ��ոӨ��
+# 用原資料來測試該函數
 bat.avg(baseball)
 
-# �}�l�ۧU���
-# �ҥΪ���Ƭ�baseball���,��N�I�sbat.avg 1,200 ��
-# �C���|����޶ǻ�����
+# 開始自助抽樣
+# 所用的資料為baseball資料,其將呼叫bat.avg 1,200 次
+# 每次會把索引傳遞到函數
 avgBoot <- boot(data=baseball, statistic=bat.avg, R=1200, stype="i")
 
-# ��ܹ���ƪ����q(original),���p�Ȫ����t(bias)�M�зǻ~�t
+# 顯示對原資料的測量(original),估計值的偏差(bias)和標準誤差
 avgBoot
 
-# ��ܫH��϶�
+# 顯示信賴區間
 boot.ci(avgBoot, conf=.95, type="norm")
 
 # ---------------------------------------------------------- #
